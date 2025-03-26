@@ -1,3 +1,5 @@
+import { users } from "@/app/api/register/route";
+import bcrypt from "bcryptjs";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
@@ -20,6 +22,22 @@ export const authOptions: NextAuthOptions = {
             id: "1",
             name: "Demo User",
             email: "user@example.com",
+          };
+        }
+
+        // Find the user in our "database"
+        const user = users.find((user) => user.email === credentials?.email);
+
+        // Check if user exists and password is correct
+        if (
+          user &&
+          (await bcrypt.compare(credentials?.password || "", user.password))
+        ) {
+          // Return the user without the password
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
           };
         }
         return null;
