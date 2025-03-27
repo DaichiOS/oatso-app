@@ -1,13 +1,15 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import LoggedInPage from "../components/auth/LoggedInPage";
 
 export default function LoginPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { data: session, status } = useSession();
     const successMessage = searchParams.get('success');
     
     const [email, setEmail] = useState("");
@@ -37,6 +39,9 @@ export default function LoginPage() {
     };
 
     return (
+        status === "authenticated" && session?.user ? (
+            <LoggedInPage user={session.user} />
+        ) : (
         <div className="flex min-h-screen flex-col items-center justify-center">
             <div className="w-full max-w-md p-8 space-y-8 bg-black rounded-lg shadow">
                 <h1 className="text-2xl font-bold text-white">Sign in</h1>
@@ -88,5 +93,5 @@ export default function LoginPage() {
 </div>
             </div>
         </div>
-    )
+    ))
 }
